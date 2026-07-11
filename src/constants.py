@@ -1,3 +1,10 @@
 DEFAULT_README_PATH = "README.md"
 DEFAULT_OUTPUT_NAME = "updated"
 DEFAULT_MODEL = "gpt-4o-mini"
+
+BRANCH_NAME = "readme-update"
+COMMIT_AUTHOR_NAME = "Always Readme Bot"
+COMMIT_AUTHOR_EMAIL = "readme@shahtech.info"
+COMMIT_MESSAGE = "docs: update README.md via AI"
+PR_TITLE = "docs: update README.md"
+PR_BODY = "Automated README update generated from the latest code diff. Please review before merging."

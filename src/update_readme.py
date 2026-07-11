@@ -2,7 +2,21 @@ from env_vars import get_env, INPUT_PREFIX, workspace
 from constants import DEFAULT_README_PATH
 import os
 import sys
-from utils import configure_git_safe_directory, get_diff, set_output, get_readme_content, build_prompt, update_readme_file
+from utils import (
+    configure_git_safe_directory,
+    configure_git_identity,
+    get_diff,
+    set_output,
+    get_readme_content,
+    build_prompt,
+    update_readme_file,
+    create_or_reset_branch,
+    commit_readme_change,
+    push_branch,
+    get_default_branch,
+    has_open_pr,
+    create_pr,
+)
 from agent import agent_ask
 
 def main():
@@ -35,6 +49,16 @@ def main():
         return
     
     update_readme_file(readme_file_path, updated_readme)
+
+    configure_git_identity()
+    create_or_reset_branch(workspace)
+    commit_readme_change(workspace, readme_file_path)
+    push_branch(workspace)
+
+    default_branch = get_default_branch(workspace)
+
+    if not has_open_pr(workspace):
+        create_pr(workspace, default_branch)
 
     set_output("true")
 

@@ -1,8 +1,17 @@
+import json
 import os
 import subprocess
 import sys
-from env_vars import output_file
-from constants import DEFAULT_OUTPUT_NAME
+from env_vars import output_file, github_token, repository, gh_environment
+from constants import (
+    DEFAULT_OUTPUT_NAME,
+    BRANCH_NAME,
+    COMMIT_AUTHOR_NAME,
+    COMMIT_AUTHOR_EMAIL,
+    COMMIT_MESSAGE,
+    PR_TITLE,
+    PR_BODY,
+)
 
 def configure_git_safe_directory(workspace):
     try:
@@ -12,6 +21,20 @@ def configure_git_safe_directory(workspace):
         )
     except (subprocess.CalledProcessError, OSError) as e:
         print(f"::error:: Failed to configure git safe directory: {e}.")
+        sys.exit(1)
+
+def configure_git_identity():
+    try:
+        subprocess.run(
+            ["git", "config", "--global", "user.name", COMMIT_AUTHOR_NAME],
+            check=True
+        )
+        subprocess.run(
+            ["git", "config", "--global", "user.email", COMMIT_AUTHOR_EMAIL],
+            check=True
+        )
+    except (subprocess.CalledProcessError, OSError) as e:
+        print(f"::error:: Failed to configure git commit identity: {e}.")
         sys.exit(1)
 
 def get_diff(workspace, base_ref):
@@ -78,4 +101,96 @@ def update_readme_file(readme_path, updated_readme_content):
             f.write(updated_readme_content)
     except OSError as e:
         print(f"::error:: Failed to write README.md at {readme_path}: {e}.")
+        sys.exit(1)
+
+def create_or_reset_branch(workspace):
+    try:
+        subprocess.run(
+            ["git", "checkout", "-B", BRANCH_NAME],
+            cwd=workspace,
+            check=True
+        )
+    except (subprocess.CalledProcessError, OSError) as e:
+        print(f"::error:: Failed to create/reset branch {BRANCH_NAME}: {e}.")
+        sys.exit(1)
+
+def commit_readme_change(workspace, readme_path):
+    try:
+        subprocess.run(
+            ["git", "add", readme_path],
+            cwd=workspace,
+            check=True
+        )
+        subprocess.run(
+            ["git", "commit", "-m", COMMIT_MESSAGE],
+            cwd=workspace,
+            check=True
+        )
+    except (subprocess.CalledProcessError, OSError) as e:
+        print(f"::error:: Failed to commit README change: {e}.")
+        sys.exit(1)
+
+def push_branch(workspace):
+    if not repository:
+        print("::error:: Missing required environment variable: GITHUB_REPOSITORY.")
+        sys.exit(1)
+
+    remote_url = f"https://x-access-token:{github_token}@github.com/{repository}.git"
+
+    try:
+        subprocess.run(
+            ["git", "push", "--force", remote_url, f"HEAD:{BRANCH_NAME}"],
+            cwd=workspace,
+            check=True,
+            capture_output=True,
+            text=True
+        )
+    except (subprocess.CalledProcessError, OSError):
+        print(f"::error:: Failed to push branch {BRANCH_NAME}.")
+        sys.exit(1)
+
+def get_default_branch(workspace):
+    try:
+        result = subprocess.run(
+            ["gh", "repo", "view", "--json", "defaultBranchRef", "-q", ".defaultBranchRef.name"],
+            cwd=workspace,
+            check=True,
+            capture_output=True,
+            text=True,
+            env=gh_environment
+        )
+    except (subprocess.CalledProcessError, OSError) as e:
+        print(f"::error:: Failed to detect default branch: {e}.")
+        sys.exit(1)
+
+    return result.stdout.strip()
+
+def has_open_pr(workspace):
+    try:
+        result = subprocess.run(
+            ["gh", "pr", "list", "--head", BRANCH_NAME, "--state", "open", "--json", "number"],
+            cwd=workspace,
+            check=True,
+            capture_output=True,
+            text=True,
+            env=gh_environment
+        )
+    except (subprocess.CalledProcessError, OSError) as e:
+        print(f"::error:: Failed to check for existing pull requests: {e}.")
+        sys.exit(1)
+
+    return len(json.loads(result.stdout)) > 0
+
+def create_pr(workspace, default_branch):
+    try:
+        subprocess.run(
+            ["gh", "pr", "create", "--head", BRANCH_NAME, "--base", default_branch, "--title", PR_TITLE, "--body", PR_BODY],
+            cwd=workspace,
+            check=True,
+            capture_output=True,
+            text=True,
+            env=gh_environment
+        )
+    except (subprocess.CalledProcessError, OSError) as e:
+        print(f"::error:: Failed to create pull request: {e}.")
         sys.exit(1)

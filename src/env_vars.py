@@ -18,11 +18,9 @@ openai_api_key = get_env(f"{INPUT_PREFIX}_OPENAI-API-KEY", required=True)
 openai_org_id = get_env(f"{INPUT_PREFIX}_OPENAI-ORG-ID", required=True)
 openai_project = get_env(f"{INPUT_PREFIX}_OPENAI-PROJECT", required=True)
 model = get_env(f"{INPUT_PREFIX}_MODEL", default=DEFAULT_MODEL)
+github_token = get_env(f"{INPUT_PREFIX}_GITHUB-TOKEN", required=True)
 
-try:
-    workspace = os.environ["GITHUB_WORKSPACE"]
-except KeyError:
-    print("::error:: Missing required environment variable: GITHUB_WORKSPACE.")
-    sys.exit(1)
-
+workspace = os.environ["GITHUB_WORKSPACE"]
 output_file = os.environ.get("GITHUB_OUTPUT")
+repository = os.environ.get("GITHUB_REPOSITORY")
+gh_environment = {**os.environ, "GH_TOKEN": github_token}

@@ -1,4 +1,4 @@
-name: "README"
+name: "Always-Readme"
 description: "Checks the latest updates in the codebase an updates the readme.md file accordingly using AI."
 inputs:
   openai-api-key:
@@ -22,6 +22,9 @@ inputs:
     description: "Git ref to diff against. Defaults to the previous commit."
     required: false
     default: ""
+  github-token:
+    description: "GitHub token used to push the README branch and open a PR"
+    required: true
 outputs:
   updated:
     description: 'Wheather README.md file was modified ("true"/"false")'
