@@ -1,0 +1,30 @@
+name: "README"
+description: "Checks the latest updates in the codebase an updates the readme.md file accordingly using AI."
+inputs:
+  openai-api-key:
+    description: "OpenAI API Key"
+    required: true
+  openai-org-id:
+    description: "OpenAI Organization Id"
+    required: true
+  openai-project:
+    description: "OpenAI Project Id"
+    required: true
+  readme-path:
+    description: "Path to README.md file"
+    required: false
+    default: "README.md"
+  model:
+    description: "OpenAI LLM to use"
+    required: false
+    default: "gpt-4o-mini"
+  base-ref:
+    description: "Git ref to diff against. Defaults to the previous commit."
+    required: false
+    default: ""
+outputs:
+  updated:
+    description: 'Wheather README.md file was modified ("true"/"false")'
+runs:
+  using: "docker"
+  image: "Dockerfile"
