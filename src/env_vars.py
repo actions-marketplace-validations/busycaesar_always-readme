@@ -1,6 +1,6 @@
 import os
 import sys
-from config import DEFAULT_MODEL
+from constants import DEFAULT_MODEL
 
 # Prefix for input variales coming from action.yml.
 INPUT_PREFIX = "INPUT"

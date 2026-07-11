@@ -2,7 +2,7 @@ import os
 import subprocess
 import sys
 from env_vars import output_file
-from config import DEFAULT_OUTPUT_NAME
+from constants import DEFAULT_OUTPUT_NAME
 
 def configure_git_safe_directory(workspace):
     try:

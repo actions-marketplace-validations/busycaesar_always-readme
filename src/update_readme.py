@@ -1,5 +1,5 @@
 from env_vars import get_env, INPUT_PREFIX, workspace
-from config import DEFAULT_README_PATH, DEFAULT_MODEL
+from constants import DEFAULT_README_PATH
 import os
 import sys
 from utils import configure_git_safe_directory, get_diff, set_output, get_readme_content, build_prompt, update_readme_file

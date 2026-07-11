@@ -1,0 +1,3 @@
+DEFAULT_README_PATH = "README.md"
+DEFAULT_OUTPUT_NAME = "updated"
+DEFAULT_MODEL = "gpt-4o-mini"
