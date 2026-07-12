@@ -25,8 +25,6 @@ A GitHub Action that uses AI to keep your `README.md` up to date automatically. 
 
 ## Usage
 
-> No versioned release has been tagged yet, so this references `@Master` directly rather than a pinned version like `@v1`. That means it always runs whatever's currently on `Master`, not a stable snapshot — expect this to change to a tagged version once one exists.
-
 ```yaml
 name: Update README
 
@@ -52,7 +50,7 @@ jobs:
 
       - name: Always-Readme
         id: always-readme
-        uses: busycaesar/always-readme@Master
+        uses: busycaesar/always-readme@v0.1.1
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
           openai-org-id: ${{ secrets.OPENAI_ORG_ID }}
