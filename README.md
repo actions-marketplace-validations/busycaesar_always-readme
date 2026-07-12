@@ -20,10 +20,12 @@ A GitHub Action that uses AI to keep your `README.md` up to date automatically. 
 5. Builds a prompt combining the diff and current README content.
 6. Sends the prompt to OpenAI's chat completions API and receives the full, updated README content.
 7. Writes the result back to disk. If it's unchanged from the current README, sets the `updated` output to `"false"` and stops.
-8. Otherwise, commits the change to a `readme-update` branch (as `Always Readme Bot`), force-pushes it, and opens a pull request into the repo's default branch — or updates the existing open PR on that branch, if there is one. The action never merges the PR itself; a human always reviews and merges it.
+8. Otherwise, commits the change to a `readme-update` branch (as `github-actions[bot]`), force-pushes it, and opens a pull request into the repo's default branch — or updates the existing open PR on that branch, if there is one. The action never merges the PR itself; a human always reviews and merges it.
 9. Sets the `updated` output to `"true"`.
 
 ## Usage
+
+> No versioned release has been tagged yet, so this references `@Master` directly rather than a pinned version like `@v1`. That means it always runs whatever's currently on `Master`, not a stable snapshot — expect this to change to a tagged version once one exists.
 
 ```yaml
 name: Update README
@@ -45,7 +47,7 @@ jobs:
 
       - name: Always-Readme
         id: always-readme
-        uses: busycaesar/always-readme@v1
+        uses: busycaesar/always-readme@Master
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
           openai-org-id: ${{ secrets.OPENAI_ORG_ID }}
@@ -55,12 +57,14 @@ jobs:
 
 ## Inputs
 
+> `github-token` is marked required below because the workflow must pass *something* — but you don't need to create or manage a token yourself. Just pass the automatic `${{ secrets.GITHUB_TOKEN }}`, which every workflow run already has.
+
 | Name             | Required | Default       | Description                                                               |
 | ---------------- | -------- | ------------- | ------------------------------------------------------------------------- |
 | `openai-api-key` | Yes      | —             | OpenAI API key.                                                           |
 | `openai-org-id`  | Yes      | —             | OpenAI organization ID.                                                   |
 | `openai-project` | Yes      | —             | OpenAI project ID.                                                        |
-| `github-token`   | Yes      | —             | GitHub token used to push the README branch and open a PR.                |
+| `github-token`   | Yes      | —             | GitHub token used to push the README branch and open a PR. Required in the workflow's `with:` block, but nothing to set up yourself — pass the automatic `${{ secrets.GITHUB_TOKEN }}` (see [Requirements](#requirements) for the permissions it needs). |
 | `readme-path`    | No       | `README.md`   | Path to the README file to check and update.                              |
 | `model`          | No       | `gpt-4o-mini` | OpenAI model used to generate the README content.                         |
 | `base-ref`       | No       | _(empty)_     | Git ref to diff against. Defaults to the previous commit (`HEAD^..HEAD`). |
