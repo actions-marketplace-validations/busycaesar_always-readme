@@ -160,7 +160,8 @@ def get_default_branch(workspace):
             env=gh_environment
         )
     except (subprocess.CalledProcessError, OSError) as e:
-        print(f"::error:: Failed to detect default branch: {e}.")
+        detail = e.stderr.strip() if isinstance(e, subprocess.CalledProcessError) and e.stderr else str(e)
+        print(f"::error:: Failed to detect default branch: {detail}.")
         sys.exit(1)
 
     return result.stdout.strip()
@@ -176,7 +177,8 @@ def has_open_pr(workspace):
             env=gh_environment
         )
     except (subprocess.CalledProcessError, OSError) as e:
-        print(f"::error:: Failed to check for existing pull requests: {e}.")
+        detail = e.stderr.strip() if isinstance(e, subprocess.CalledProcessError) and e.stderr else str(e)
+        print(f"::error:: Failed to check for existing pull requests: {detail}.")
         sys.exit(1)
 
     return len(json.loads(result.stdout)) > 0
@@ -192,5 +194,6 @@ def create_pr(workspace, default_branch):
             env=gh_environment
         )
     except (subprocess.CalledProcessError, OSError) as e:
-        print(f"::error:: Failed to create pull request: {e}.")
+        detail = e.stderr.strip() if isinstance(e, subprocess.CalledProcessError) and e.stderr else str(e)
+        print(f"::error:: Failed to create pull request: {detail}.")
         sys.exit(1)
