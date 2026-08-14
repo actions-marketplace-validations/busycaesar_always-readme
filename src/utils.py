@@ -83,8 +83,13 @@ def build_prompt(git_diff, readme_content):
 
     return (
         "You are updating a project's README.md to reflect recent code changes.\n"
-        "Only change sections that are outdated or incomplete because of the diff below. "
-        "Keep the existing tone, structure, and any unaffected sections untouched. "
+        "Rules:\n"
+        "1. Only touch parts of the README that are now outdated or incorrect because of the diff below. "
+        "If nothing in the diff affects the README, return it completely unchanged.\n"
+        "2. Do not add any new section unless the diff introduces something that has no existing section to "
+        "document it and clearly warrants one (e.g. a new feature, input, or command). When in doubt, don't add one.\n"
+        "3. Do not fix, rewrite, or improve any existing wording, formatting, or structure that is unrelated to "
+        "the diff — even if you think it could be better. Leave unrelated sections byte-for-byte untouched.\n"
         "Return the FULL updated README.md content and nothing else — no explanations, no code fences.\n\n"
         f"## Git diff\n{git_diff}\n\n"
         f"## Current README.md\n{readme_content}"
